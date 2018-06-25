@@ -1,0 +1,47 @@
+{% extends "home/user_base.html" %}
+{% import "ui/home_page.html" as pg %}
+{% block user %}
+     <div class="col-md-9">
+        <div class="panel panel-warning">
+            <div class="panel-heading">
+                <h3 class="panel-title"><span class="glyphicon glyphicon-map-marker"></span>&nbsp;评论记录</h3>
+            </div>
+            <div class="panel-body">
+                <ul class="commentList">
+                {% for v in page_data.items %}
+                        <li class="item cl">
+                            <a href="user.html">
+                                <i class="avatar size-L radius">
+                                    {% if user.avatar %}
+                                         <img alt="50x50" src="{{ url_for('static',filename='uploads/avatar/'+user.avatar) }}" class="img-circle" style="border:1px solid #abcdef; width: 50px; height: 50px;">
+                                    {% else %}
+                                        <img alt="50x50" src="{{ url_for('static',filename='uploads/avatar/link111.jpg') }}" class="img-circle" style="border:1px solid #abcdef; width: 50px; height: 50px;">
+                                    {% endif %}
+
+                                </i>
+                            </a>
+                            <div class="comment-main">
+                                <header class="comment-header">
+                                    <div class="comment-meta">
+                                        <a class="comment-author" href="">{{ user.username }}</a>
+                                        评论于
+                                        <time title="{{ v.addtime }}" datetime="{{ v.addtime }}">{{ v.addtime }}</time>
+                                    </div>
+                                </header>
+                                <div class="comment-body">
+                                    <p>{{ v.content|safe}}</p>
+                                </div>
+                            </div>
+                        </li>
+                {% endfor %}
+
+                    </ul>
+                    <div class="col-md-12 text-center">
+                        <nav aria-label="Page navigation">
+                           {{ pg.page(page_data,'home.comments') }}
+                        </nav>
+                    </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

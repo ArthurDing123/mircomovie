@@ -1,0 +1,8 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<form method="post">
+   {{ form.csrf_token }}
+    {{ form.title }}
+    {{ form.submit(value="提交") }}
+</form>
+{% endblock %}

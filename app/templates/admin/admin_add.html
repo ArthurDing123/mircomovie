@@ -1,0 +1,75 @@
+{% extends "admin/base.html" %}
+{% import "ui/valierr.html" as vali %}
+{% block content %}
+    <!--内容-->
+    <section class="content-header">
+        <h1>微电影管理系统</h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> 管理员管理</a></li>
+            <li class="active">添加管理员</li>
+        </ol>
+    </section>
+    <section class="content" id="showcontent">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">添加管理员</h3>
+                    </div>
+                    {% include "ui/msg.html" %}
+                    <form role="form" method="post">
+                    {{ form.csrf_token }}
+                        <div class="box-body">
+                            <div class="form-group">
+                                 {{ form.name.label(for="input_name") }}
+                                {{ form.name(class="form-control", id="input_name", placeholder="请输入管理员名称！") }}
+                                {% for e in form.name.errors %}
+                                    <span style="color: red">
+                                    {{ e }}
+                                    </span>
+                                {% endfor %}
+                            </div>
+                            <div class="form-group">
+                                {{ form.pwd.label(for="input_pwd") }}
+                                {{ form.pwd(class="form-control",id="input_pwd",placeholder="请输入管理员密码！") }}
+                                 {% for e in form.pwd.errors %}
+                                    <span style="color: red">
+                                    {{ e }}
+                                    </span>
+                                {% endfor %}
+                            </div>
+                            <div class="form-group">
+                                {#                                    <label for="input_re_pwd">管理员重复密码</label>#}
+                                {#                                    <input type="password" class="form-control" id="input_re_pwd"#}
+                                {#                                           placeholder="请输入管理员重复密码！">#}
+                                {{ form.pwd2.label(for="input_re_pwd") }}
+                                {{ form.pwd2(class="form-control",id="input_re_pwd",placeholder="请输入管理员重复密码！") }}
+                                 {% for e in form.pwd2.errors %}
+                                    <span style="color: red">
+                                    {{ e }}
+                                    </span>
+                                {% endfor %}
+
+                            </div>
+                            <div class="form-group">
+                                <label for="input_role_id">所属角色</label>
+                                 {{ form.roles(class="form-control",id="input_role_id") }}
+                                  {% for e in form.roles.errors %}
+                                    <span style="color: red">
+                                    {{ e }}
+                                    </span>
+                                {% endfor %}
+
+                            </div>
+                        </div>
+                        <div class="box-footer">
+{#                            <button type="submit" class="btn btn-primary">添加</button>#}
+                            {{ form.submit(class="btn btn-primary",value="添加") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--内容-->
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "home/user_base.html" %}
+{% import "ui/home_page.html" as pg %}
+{% block user %}
+    <div class="col-md-9">
+        <div class="panel panel-warning">
+            <div class="panel-heading">
+                <h3 class="panel-title"><span class="glyphicon glyphicon-map-marker"></span>&nbsp;收藏电影</h3>
+            </div>
+            <div class="panel-body">
+                <div class="col-md-12">
+                    {% for v in page_data.items %}
+                    <div class="media">
+                        <div class="media-left">
+                            <a href="{{url_for('home.play',id=v.movie.id)}}">
+                                <img class="media-object" src="{{ url_for('static',filename='uploads/pic/'+v.movie.logo) }}" style="width: 131px; height: 83px;" alt="环太平洋">
+                            </a>
+                        </div>
+                        <div class="media-body">
+                            <h4 class="media-heading">{{ v.movie.title }}<a href="{{url_for('home.play',id=v.movie.id)}}" class="label label-primary pull-right"><span class="glyphicon glyphicon-play"></span>播放影片</a></h4>
+                            {{ v.movie.info }}
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                </div>
+                <div class="col-md-12 text-center" style="margin-top:6px;">
+                    <nav aria-label="Page navigation">
+                        {{ pg.page(page_data,'home.moviecol') }}
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

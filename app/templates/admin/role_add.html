@@ -1,0 +1,78 @@
+{% extends "admin/base.html" %}
+{% block content %}
+    <!--内容-->
+    <section class="content-header">
+        <h1>微电影管理系统</h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> 角色管理</a></li>
+            <li class="active">添加角色</li>
+        </ol>
+    </section>
+    <section class="content" id="showcontent">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">添加角色</h3>
+                    </div>
+                    {% with messges = get_flashed_messages(category_filter='ok') %}
+                        {% if messges %}
+                            {% for msg in messges %}
+                                <div class="alert alert-success alert-dismissible" role="alert">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                                            aria-hidden="true">&times;</span></button>
+                                    <strong>{{ msg }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    {% with messages = get_flashed_messages(category_filter='err') %}
+                        {% if messages %}
+                            {% for msg in messages %}
+                                <div class="alert alert-danger alert-dismissible" role="alert">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                                            aria-hidden="true">&times;</span></button>
+                                    <strong>{{ msg }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    <form role="form" method="post">
+
+                        <div class="box-body">
+                            <div class="form-group">
+                                {{ form.name.label(for="input_name") }}
+                                {{ form.name(class="form-control",id="input_name", placeholder="请输入角色名称！") }}
+                                {% for e in form.name.errors %}
+                                    <span style="color: red">
+                                    {{ e }}
+                                    </span>
+                                {% endfor %}
+                            </div>
+                            <div class="form-group" id="auth_list">
+                                <div class="col-md-12">
+                                    {{ form.auths.label }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label>
+                                        {{ form.auths }}
+                                    </label>
+                                    {% for e in form.auths.errors %}
+                                        <span style="color: red">
+                                    {{ e }}
+                                    </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box-footer">
+                            {{ form.csrf_token }}
+                            {{ form.submit(class="btn btn-primary",value="添加") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--内容-->
+{% endblock %}

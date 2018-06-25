@@ -1,0 +1,10 @@
+{% macro vali(errs) -%}
+    {% if errs %}
+        {% for e in errs %}
+            <span style="color: red">
+            {{ e }}
+            </span>
+        {% endfor %}
+    {% endif %}
+
+{%- endmacro %}

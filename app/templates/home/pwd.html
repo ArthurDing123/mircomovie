@@ -1,0 +1,50 @@
+{% extends "home/user_base.html" %}
+{% block user %}
+    <div class="col-md-9">
+        <div class="panel panel-warning">
+            <div class="panel-heading">
+                <h3 class="panel-title"><span class="glyphicon glyphicon-map-marker"></span>&nbsp;会员中心</h3>
+            </div>
+            <div class="panel-body">
+                {% include "ui/msg.html" %}
+                <form role="form" method="post">
+                    <fieldset>
+                            <div class="form-group">
+                                <label for="input_oldpwd"><span class="glyphicon glyphicon-lock"></span>&nbsp;旧密码</label>
+{#                                <input id="input_oldpwd" class="form-control" placeholder="旧密码" name="oldpwd" type="password" autofocus>#}
+                                {{ form.old_pwd(id="input_oldpwd",class="form-control",placeholder="旧密码") }}
+                            </div>
+                            <div class="col-md-12" id="error_oldpwd">
+                                {% for e in form.old_pwd.errors %}
+                                    <span style="color: red">{{ e }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="form-group">
+                                <label for="input_newpwd"><span class="glyphicon glyphicon-lock"></span>&nbsp;新密码</label>
+{#                                <input id="input_newpwd" class="form-control" placeholder="新密码" name="newpwd" type="password" autofocus>#}
+                                  {{ form.pwd(id="input_newpwd",class="form-control",placeholder="新密码") }}
+                            </div>
+                            <div class="col-md-12" id="error_newpwd">
+                                {% for e in form.pwd.errors %}
+                                    <span style="color: red">{{ e }}</span>
+                                {% endfor %}
+                            </div>
+                                       <div class="form-group">
+                                <label for="input_newpwd"><span class="glyphicon glyphicon-lock"></span>&nbsp;新密码</label>
+{#                                <input id="input_newpwd" class="form-control" placeholder="新密码" name="newpwd" type="password" autofocus>#}
+                                  {{ form.pwd2(id="input_newpwd",class="form-control",placeholder="新密码") }}
+                            </div>
+                            <div class="col-md-12" id="error_newpwd">
+                               {% for e in form.pwd2.errors %}
+                                    <span style="color: red">{{ e }}</span>
+                                {% endfor %}
+                            </div>
+{#                            <a href="login.html" class="btn btn-success"><span class="glyphicon glyphicon-edit"></span>&nbsp;修改密码</a>#}
+                                {{ form.csrf_token }}
+                                {{ form.submit(class="btn btn-success glyphicon glyphicon-edit",value="修改密码") }}
+                        </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
