@@ -2,6 +2,7 @@
 # _*_ coding:utf-8 _*_
 # Author:Arthur
 
+
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db
@@ -14,7 +15,7 @@ class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), index=True, unique=True)  # 用户名
-    password = db.Column(db.String(100))  # 密码
+    _password = db.Column(db.String(100))  # 密码
     email = db.Column(db.String(100), unique=True)  # 邮箱
     phone_num = db.Column(db.String(11), unique=True)  # 电话号码
     info = db.Column(db.Text)  # 用户信息
@@ -25,10 +26,13 @@ class User(db.Model):
     comments = db.relationship('Comment', backref='user')  # 评论数
     moviecols = db.relationship('Moviecol', backref='user')  # 电影收藏
 
-    # password　　has加密
-    def set_password(self, password):
-        self.password = generate_password_hash(password)
+    @property
+    def password(self):
+        return self._password
 
+    @password.setter
+    def password(self,raw):
+        self._password = generate_password_hash(raw)
     # password  has验证
     def check_password(self, password):
         return check_password_hash(self.password, password)
@@ -51,6 +55,21 @@ class UserLog(db.Model):
         return '<UserLog %r>' % self.id
 
 
+class Comment(db.Model):
+    """
+    评论表
+    """
+    __tablename__ = 'comment'
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text)  # 评论内容
+    movie_id = db.Column(db.Integer, db.ForeignKey('movie.id'))  # 所属电影
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # 所属用户
+    addtime = db.Column(db.DateTime, index=True, default=datetime.now)  # 评论时间
+
+    def __repr__(self):
+        return '<Comment %r>' % self.id
+
+
 class Admin(db.Model):
     """
     管理员表
@@ -58,16 +77,20 @@ class Admin(db.Model):
     __tablename__ = 'admin'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), index=True, unique=True)  # 用户名
-    password = db.Column(db.String(100), unique=True)  # 密码
+    _password = db.Column(db.String(100), unique=True)  # 密码
     is_super = db.Column(db.SmallInteger)  # 是否为超级管理员 0是
     role_id = db.Column(db.Integer, db.ForeignKey('role.id'))  # 所属角色
     addtime = db.Column(db.DateTime, index=True, default=datetime.now)  # 添加时间
     adminlogs = db.relationship("AdminLog", backref='admin')
     oplogs = db.relationship("Oplog", backref='admin')
 
-    # hash加密
-    def set_password(self, password):
-        self.password = generate_password_hash(password)
+    @property
+    def password(self):
+        return self._password
+
+    @password.setter
+    def password(self, raw):
+        self._password = generate_password_hash(raw)
 
     # hash解密
     def check_password(self, password):
@@ -145,34 +168,6 @@ class Movie(db.Model):
         return '<Movie %r>' % self.title
 
 
-class Preview(db.Model):
-    """
-    上映预告表
-    """
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(255), unique=True)  # 标题
-    logo = db.Column(db.String(255))  # 封面
-    addtime = db.Column(db.DateTime, index=True, default=datetime.now)  # 添加时间
-
-    def __repr__(self):
-        return '<Preview %r>' % self.title
-
-
-class Comment(db.Model):
-    """
-    评论表
-    """
-    __tablename__ = 'comment'
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.Text)  # 评论内容
-    movie_id = db.Column(db.Integer, db.ForeignKey('movie.id'))  # 所属电影
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # 所属用户
-    addtime = db.Column(db.DateTime, index=True, default=datetime.now)  # 评论时间
-
-    def __repr__(self):
-        return '<Comment %r>' % self.id
-
-
 class Moviecol(db.Model):
     """
     电影收藏
@@ -214,3 +209,18 @@ class Auth(db.Model):
 
     def __repr__(self):
         return '<Auth %r>' % self.name
+
+
+class Preview(db.Model):
+    """
+    上映预告表
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), unique=True)  # 标题
+    logo = db.Column(db.String(255))  # 封面
+    addtime = db.Column(db.DateTime, index=True, default=datetime.now)  # 添加时间
+
+    def __repr__(self):
+        return '<Preview %r>' % self.title
+
+
