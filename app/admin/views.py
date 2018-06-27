@@ -6,8 +6,8 @@ import os
 from flask import render_template, redirect, flash, request, url_for, session
 from werkzeug.utils import secure_filename
 from app.admin import admin
-from .forms import *
-from app.models import *
+from app.admin.forms import LoginForm,AdminForm,AuthForm,TagForm,MovieForm,PreviewForm,RoleForm
+from app.models import Tag,Movie,Preview,Moviecol,Auth,Role,Admin,User
 from app import db, app
 from tools import change_upload_filename, admin_login_req,admin_auth
 
