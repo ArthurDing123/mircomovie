@@ -64,4 +64,4 @@ def admin_auth(func):
 
 # 自定义星级过滤器
 def star(num):
-    return ['一', '二', '三', '四', '五'][num]
+    return ['一', '二', '三', '四', '五'][num-1]
