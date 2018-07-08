@@ -3,12 +3,13 @@
 # Author:Arthur
 
 import os
-from flask import render_template, redirect, flash, request, url_for, session
+from flask import render_template, redirect, flash, request, url_for, session, Response
 from uuid import uuid4
+from datetime import datetime
+import json
 from werkzeug.utils import secure_filename
 from tools import change_upload_filename
-import json
-from app import app, db
+from app import app, db, rd
 from app.home import home
 from .forms import LoginForm, RegisterForm, UserForm, PwdForm, CommentForm
 from app.models import User, UserLog, Preview, Tag, Movie, Comment, Moviecol
@@ -68,15 +69,17 @@ def index():
 
 # 评论
 @home.route('/search')
-@home.route('/search/<int:page>')
+@home.route('/search/<int:page>', methods=['get', 'post'])
 def search(page=None):
     if page is None:
         page = 1
     key = request.args.get('key')
+    if not key:
+        key = request.form.get('key')
     page_data = Movie.query
     page_data = page_data.filter(Movie.title.ilike("%" + key + "%"))
-    page_data = page_data.filter(Movie.info.ilike("%" + key + "%")).paginate(page,10)
-    return render_template('home/search.html', key=key,page_data=page_data)
+    page_data = page_data.filter(Movie.info.ilike("%" + key + "%")).paginate(page, 10)
+    return render_template('home/search.html', key=key, page_data=page_data)
 
 
 # 评论
@@ -93,9 +96,13 @@ def comments(page=None):
 
 
 # 登录日志
+@home.route('/loginlog')
 @home.route('/loginlog/<int:page>')
-def loginlog(page):
-    page_data = UserLog.query.filter_by(user_id=int(session.get('User_id'))).order_by(UserLog.addtime).paginate(page, 10)
+def loginlog(page=None):
+    if page is None:
+        page = 1
+    page_data = UserLog.query.filter_by(user_id=int(session.get('User_id'))).order_by(UserLog.addtime).paginate(page,
+                                                                                                                10)
 
     return render_template('home/loginlog.html', page_data=page_data)
 
@@ -132,9 +139,10 @@ def moviecol(page=None):
 
     return render_template('home/moviecol.html', page_data=page_data)
 
-#播放页
-@home.route('/play/<int:id>')
-@home.route('/play/<int:id>/<int:page>', methods=["get", "post"])
+
+# 播放页
+@home.route('/play/<int:id>', methods=["GET", "POST"])
+@home.route('/play/<int:id>/<int:page>', methods=["GET", "POST"])
 def play(id=None, page=None):
     if page == None:
         page = 1
@@ -153,7 +161,7 @@ def play(id=None, page=None):
         db.session.add(movie)
         db.session.commit()
         flash("评论成功", "ok")
-        return redirect(url_for('home.play', id=movie.id, page=1))
+        return redirect(url_for('home.play', id=movie.id))
     db.session.add(movie)
     db.session.commit()
     # 评论列表
@@ -163,14 +171,86 @@ def play(id=None, page=None):
     return render_template('home/play.html', movie=movie, form=form, page_data=page_data, page=page)
 
 
+# 播放页
+@home.route('/vedio/<int:id>', methods=["GET", "POST"])
+@home.route('/vedio/<int:id>/<int:page>', methods=["GET", "POST"])
+def vedio(id=None, page=None):
+    if page == None:
+        page = 1
+    movie = Movie.query.get_or_404(id)
+    movie.playnum += 1
+    form = CommentForm()
+    # 评论
+    if session.get('user') and form.validate_on_submit():
+        data = form.data
+        comm = Comment(content=data['content'],
+                       user_id=session.get('User_id'),
+                       movie_id=movie.id)
+        db.session.add(comm)
+        db.session.commit()
+        movie.commentnum += 1
+        db.session.add(movie)
+        db.session.commit()
+        flash("评论成功", "ok")
+        return redirect(url_for('home.vedio', id=movie.id))
+    db.session.add(movie)
+    db.session.commit()
+    # 评论列表
+
+    page_data = Comment.query.join(User).filter(User.id == Comment.user_id).order_by(Comment.addtime.desc()).paginate(
+        page, 10)
+    return render_template('home/vedio.html', movie=movie, form=form, page_data=page_data, page=page)
+
+
+@app.route('/danmu', methods=['get', 'post'])
+def danmu():
+    if request.method == "GET":
+        id = request.args.get('id')
+        key = 'movie' + str(id)
+        if rd.llen(key):
+            msgs = rd.lrange(key, 0, 2999)
+            res = {
+                'code': 1,
+                'danmaku': [json.loads(v) for v in msgs]
+            }
+        else:
+            res = {
+                'code': 1,
+                'danmuku': []
+            }
+        resp = json.dumps(res)
+    if request.method == "POST":
+        data = json.loads(request.get_data())
+        msg = {
+            "__v": 0,
+            "author": data["author"],
+            "time": data["time"],
+            "text": data["text"],
+            "color": data["color"],
+            "type": data['type'],
+            "ip": request.remote_addr,
+            "_id": datetime.now().strftime("%Y%m%d%H%M%S") + uuid4().hex,
+            "player": [data["player"]]
+
+        }
+        res = {
+            'code': 1,
+            'data': msg
+        }
+        resp = json.dumps(res)
+        rd.lpush('movie' + str(data['player']), json.dumps(msg))
+    return Response(resp, mimetype='application/json')
+
+
 # 登录
 @home.route('/login', methods=['get', 'post'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        data = form.data
-        user = User.query.filter_by(username=data['username']).first()
-        if user.check_password(data['password']):
+        user = User.query.filter_by(username=form.username.data).first()
+        print("用户名：{}".format(user.username))
+        print("传入的密码:{}".format(form.password.data))
+        if user and user.check_password(form.password.data):
             session['user'] = user.username
             session['User_id'] = user.id
             # 持久化　默认保存31天，可通过在config中设置PERMENENT_SESSION_LIFETIME改变
@@ -198,9 +278,10 @@ def register():
             username=data['username'],
             email=data['email'],
             phone_num=data['phone_num'],
+            password=data['password'],
+            avatar="link111.jpg",
             uuid=uuid4().hex
         )
-        user.set_password(data['password'])
         db.session.add(user)
         db.session.commit()
         flash("注册成功", 'ok')

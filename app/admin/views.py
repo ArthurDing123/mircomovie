@@ -7,7 +7,7 @@ from flask import render_template, redirect, flash, request, url_for, session
 from werkzeug.utils import secure_filename
 from app.admin import admin
 from app.admin.forms import LoginForm,AdminForm,AuthForm,TagForm,MovieForm,PreviewForm,RoleForm
-from app.models import Tag,Movie,Preview,Moviecol,Auth,Role,Admin,User
+from app.models import Tag,Movie,Preview,Moviecol,Auth,Role,Admin,User,Comment
 from app import db, app
 from tools import change_upload_filename, admin_login_req,admin_auth
 
@@ -132,8 +132,11 @@ def movie_list(page):
 @admin_auth
 def movie_del(id):
     movie = Movie.query.get_or_404(int(id))
-    os.remove(os.path.join(app.config['UP_MOVIE_DIR'], movie.url))
-    os.remove(os.path.join(app.config['UP_PIC_DIR'], movie.logo))
+    try:
+        os.remove(os.path.join(app.config['UP_MOVIE_DIR'], movie.url))
+        os.remove(os.path.join(app.config['UP_PIC_DIR'], movie.logo))
+    except:
+        pass
     db.session.delete(movie)
     db.session.commit()
     flash("删除成功", "ok")
@@ -166,7 +169,10 @@ def movie_edit(id):
             movie.release_time = data['release_time'],
             # 有新url提交说明有新数据要上传
             if form.url.data is not None:
-                os.remove(os.path.join(app.config['UP_MOVIE_DIR'], movie.url))
+                try:
+                    os.remove(os.path.join(app.config['UP_MOVIE_DIR'], movie.url))
+                except:
+                    pass
                 file_url = secure_filename(form.url.data.filename)
                 url = change_upload_filename(file_url)
                 movie.url = url
@@ -174,7 +180,10 @@ def movie_edit(id):
 
             # 有新logo提交说明有新数据要上传
             if form.logo.data is not None:
-                os.remove(os.path.join(app.config['UP_PIC_DIR'], movie.logo))
+                try:
+                    os.remove(os.path.join(app.config['UP_PIC_DIR'], movie.logo))
+                except:
+                    pass
                 file_logo = secure_filename(form.url.data.filename)
                 logo = change_upload_filename(file_logo)
                 movie.logo = logo
@@ -227,7 +236,10 @@ def preview_list(page):
 @admin_auth
 def preview_del(id):
     preview = Preview.query.get_or_404(int(id))
-    os.remove(os.path.join(app.config['UP_PIC_DIR'], preview.logo))
+    try:
+        os.remove(os.path.join(app.config['UP_PIC_DIR'], preview.logo))
+    except:
+        pass
     db.session.delete(preview)
     db.session.commit()
     flash("删除成功", "ok")
@@ -249,7 +261,10 @@ def preview_edit(id):
         if t == 0:
             preview.title = form.title.data
             if form.logo.data is not None:
-                os.remove(os.path.join(app.config['UP_PIC_DIR'], preview.logo))
+                try:
+                    os.remove(os.path.join(app.config['UP_PIC_DIR'], preview.logo))
+                except:
+                    pass
                 file = secure_filename(form.logo.data.filename)
                 logo = change_upload_filename(file)
                 form.logo.data.save(os.path.join(app.config['UP_PIC_DIR'], logo))
@@ -286,7 +301,10 @@ def user_view(id):
 @admin_auth
 def user_del(id):
     user = User.query.get_or_404(int(id))
-    os.remove(os.path.join(app.config['UP_AVATAR_DIR'], user.avatar))
+    try:
+        os.remove(os.path.join(app.config['UP_AVATAR_DIR'], user.avatar))
+    except:
+        pass
     db.session.delete(user)
     db.session.commit()
     flash("删除成功", "ok")
@@ -294,6 +312,7 @@ def user_del(id):
 
 
 # 评论列表
+@admin.route('/comment/list')
 @admin.route('/comment/list/<int:page>')
 @admin_login_req
 @admin_auth

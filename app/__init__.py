@@ -6,6 +6,7 @@ from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
+from flask_redis import FlaskRedis
 import config
 
 # 设置初始化数据
@@ -14,6 +15,7 @@ app.config.from_object(config)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
+rd = FlaskRedis(app)
 
 # 注册蓝图
 from app.admin import admin as admin_bp

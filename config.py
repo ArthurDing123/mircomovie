@@ -16,9 +16,10 @@ SECRET_KEY = "ASDFASD1234ASF"
 
 
 #session保存时间
-PERMENENT_SESSION_LIFETIME =timedelta(days=7)
+PERMENENT_SESSION_LIFETIME =timedelta(days=31)
 
-
+#redis配置
+REDIS_URL = "redis://127.0.0.1:6379/0"
 
 # 数据库设置
 db_username = 'root'

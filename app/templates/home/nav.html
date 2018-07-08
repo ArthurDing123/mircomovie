@@ -45,14 +45,18 @@
         <!--小屏幕导航按钮和logo-->
         <!--导航-->
         <div class="navbar-collapse collapse">
-            <form class="navbar-form navbar-left" role="search" style="margin-top:18px;">
+            <div class="navbar-form navbar-left" role="search" style="margin-top:18px;">
                 <div class="form-group input-group">
-                    <input id="key_movie" type="text" class="form-control" placeholder="请输入电影名！">
+                    {% if not key %}
+                        <input id="key_movie" type="text" class="form-control" placeholder="请输入电影名！">
+                    {% else %}
+                    <input id="key_movie" type="text" class="form-control" value="{{ key }}">
+                    {% endif %}
                     <span class="input-group-btn">
                         <a id="do_search" class="btn btn-default"><span class="glyphicon glyphicon-search"></span>&nbsp;搜索</a>
                     </span>
                 </div>
-            </form>
+            </div>
             <ul class="nav navbar-nav navbar-right">
                 <li>
                     <a class="curlink" href="{{ url_for('home.index') }}"><span class="glyphicon glyphicon-film"></span>&nbsp;电影</a>
@@ -102,7 +106,7 @@
 <!--底部-->
 <script src="{{ url_for('static',filename='base/js/jquery.min.js')}}"></script>
 <script src="{{ url_for('static',filename='base/js/bootstrap.min.js')}}"></script>
-<script src=".{{ url_for('static',filename='base/js/jquery.singlePageNav.min.js')}}"></script>
+<script src="{{ url_for('static',filename='base/js/jquery.singlePageNav.min.js')}}"></script>
 <script src="{{ url_for('static',filename='base/js/wow.min.js')}}"></script>
 <script src="{{ url_for('static',filename='lazyload/jquery.lazyload.min.js')}}"></script>
 <script src="//cdn.bootcss.com/holder/2.9.4/holder.min.js"></script>
@@ -119,26 +123,20 @@
             effect: "fadeIn"
         });
         $("#do_search").click(function () {
-            var key = $("#key_movie").val()
-            location.href = "{{ url_for('home.search',page=1) }}?key="+key
-            
-        })
+            var key = $("#key_movie").val();
+            location.href = "{{ url_for('home.search') }}?key="+key;
+
+        });
+        $("#key_movie").keydown(function (e) {
+            if (e.keyCode == 13){
+                var key = $("#key_movie").val();
+                location.href = "{{ url_for('home.search') }}?key="+key;
+
+            }
+
+        });
     });
 
 </script>
-<script>
-   $(function () {
-       $("#key_movie").keydown(function (e) {
-           if (e.keyCode == 13){
-            var key = $("#key_movie").val()
-            location.href = "{{ url_for('home.search',page=1) }}?key="+key
-
-           }
-
-       })
-
-   })
-</script>
-
 </body>
 </html>
